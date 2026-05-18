@@ -9,45 +9,6 @@
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" alt="JWT" />
 </div>
 
-## 📑 Table of Contents
-
-- [Project Title](#-nexride---full-stack-vehicle-booking-management-system)
-- [Project Description](#-project-description)
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [System Architecture](#-system-architecture)
-- [Folder Structure](#-folder-structure)
-- [Installation Guide](#-installation-guide)
-- [Environment Variables](#-environment-variables)
-- [Backend Setup](#-backend-setup)
-- [Frontend Setup](#-frontend-setup)
-- [Running the Project](#-running-the-project)
-- [API Structure](#-api-structure)
-- [Authentication Flow](#-authentication-flow)
-- [Database Design Overview](#-database-design-overview)
-- [MongoDB Collections](#-mongodb-collections)
-- [Middleware Overview](#-middleware-overview)
-- [Validation System](#-validation-system)
-- [Error Handling](#-error-handling)
-- [Search / Filter / Pagination](#-search--filter--pagination)
-- [Aggregation Features](#-aggregation-features)
-- [Security Features](#-security-features)
-- [Rate Limiting](#-rate-limiting)
-- [API Response Format](#-api-response-format)
-- [Deployment Ready Features](#-deployment-ready-features)
-- [Future Improvements](#-future-improvements)
-- [Learning Outcomes](#-learning-outcomes)
-- [Screenshots Placeholder Section](#-screenshots-placeholder-section)
-- [API Documentation Section](#-api-documentation-section)
-- [Postman Collection Section](#-postman-collection-section)
-- [Contributing Guidelines](#-contributing-guidelines)
-- [Git Workflow](#-git-workflow)
-- [Commit Naming Convention](#-commit-naming-convention)
-- [License](#-license)
-- [Author Section](#-author-section)
-
----
-
 ## 📝 Project Description
 
 NexRide is a comprehensive, scalable, and highly secure vehicle booking management system designed to emulate the core functionalities of industry-leading ride-hailing applications like Uber and Ola. The platform seamlessly bridges the gap between passengers seeking reliable transportation and drivers offering their services. It features role-based access control, real-time fare estimation, geo-spatial driver tracking, and an extensive admin dashboard for fleet management and analytics. Built using the robust MERN stack, the application ensures high performance, maintainability, and scalability to handle thousands of concurrent ride requests.
