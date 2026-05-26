@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vehicle Booking API",
+    "description": "Full Stack Vehicle Booking System Backend APIs",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api/v1",
+      "description": "Local server (v1)"
+    },
+    {
+      "url": "http://localhost:5000",
+      "description": "Local server (root)"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password": { "type": "string" },
+                  "role": { "type": "string", "enum": ["user", "admin"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          }
+        }
+      }
+    },
+    "/bookings": {
+      "get": {
+        "summary": "Get all bookings (Supports Pagination, Filters, Sorting)",
+        "tags": ["Bookings"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookings fetched successfully"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new booking",
+        "tags": ["Bookings"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "customer": { "type": "string" },
+                  "vehicle": { "type": "string" },
+                  "pickupLocation": { "type": "string" },
+                  "dropLocation": { "type": "string" },
+                  "distance": { "type": "number" },
+                  "fare": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Booking created"
+          }
+        }
+      }
+    },
+    "/bookings/compare": {
+      "get": {
+        "summary": "Compare multiple bookings",
+        "tags": ["Bookings"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "booking1",
+            "schema": { "type": "string" },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "booking2",
+            "schema": { "type": "string" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookings compared successfully"
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Search bookings via regex keyword",
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "keyword",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results"
+          }
+        }
+      }
+    }
+  }
+}
