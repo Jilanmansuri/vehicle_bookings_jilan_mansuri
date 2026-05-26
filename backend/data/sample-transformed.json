@@ -1,0 +1,23 @@
+{
+  "bookingId": "CNR7153255142",
+  "date": "2024-07-26T08:30:00.000Z",
+  "time": "14:00:00",
+  "status": "Canceled by Driver",
+  "customer": "6a152d517517bcb09e30f10a",
+  "driver": "6a152d567517bcb09e313811",
+  "vehicle": "6a152d557517bcb09e3137d1",
+  "pickupLocation": "6a152d557517bcb09e3137d9",
+  "dropLocation": "6a152d557517bcb09e3137da",
+  "vTat": null,
+  "cTat": null,
+  "cancelReasonCustomer": null,
+  "cancelReasonDriver": "Personal & Car related issue",
+  "incompleteRide": "No",
+  "incompleteReason": null,
+  "fare": 444,
+  "paymentMethod": null,
+  "distance": 0,
+  "driverRating": null,
+  "customerRating": null,
+  "_id": "6a152d567517bcb09e313844"
+}
