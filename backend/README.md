@@ -1,67 +1,90 @@
 # Full Stack Vehicle Booking System - Backend
 
-This is the production-ready backend initialization for the Vehicle Booking System.
+This is the production-ready backend for the Vehicle Booking System, built with **Node.js, Express, and MongoDB (Mongoose)**. It follows a strict **Model-View-Controller (MVC)** architecture (Services & Controllers separated).
 
-## Architecture Decisions
+## 🏗️ Architecture Layers
 
-The backend is built using a modern **Node.js, Express, and MongoDB** stack with **Mongoose**. It employs a clean **Model-View-Controller (MVC)** architecture (minus the Views, as this is a pure API) and separates concerns into logical layers:
+1. **Routes (`src/routes`)**: Define API endpoints and apply middlewares (Auth, Rate Limiting).
+2. **Controllers (`src/controllers`)**: Parse incoming requests (`req.body`, `req.query`), call the appropriate Service, and return standardized HTTP responses.
+3. **Services (`src/services`)**: Contain the core business logic, database queries, and aggregations.
+4. **Models (`src/models`)**: Define Mongoose schemas, relationships (ObjectIds), and apply plugins like pagination.
+5. **Middlewares (`src/middlewares`)**: Handle JWT authentication (`verifyJWT`), role-based access (`isAdmin`), and global error catching.
+6. **Utils (`src/utils`)**: Reusable helpers like `ApiResponse.js`, `ApiError.js`, `asyncHandler.js`, and the powerful `queryBuilder.js`.
 
-1.  **Controllers (`src/controllers`)**: Handle incoming HTTP requests, process data by calling services, and return the appropriate HTTP responses.
-2.  **Services (`src/services`)**: Contain the core business logic. They decouple business logic from the controllers, making it reusable and easier to test.
-3.  **Routes (`src/routes`)**: Define API endpoints and map them to specific controller functions.
-4.  **Models (`src/models`)**: Define Mongoose schemas for MongoDB data structure and interact with the database.
-5.  **Middlewares (`src/middlewares`)**: Centralize common operations like error handling, authentication, logging, and rate limiting.
-6.  **Validators (`src/validators`)**: Keep input validation separate from controllers to ensure request data is correct before processing.
-7.  **Utils (`src/utils`)**: Provide common, reusable helper functions (e.g., standardizing API responses, error formatting).
+## 📦 Key Packages
 
-This architecture is chosen because it allows the application to scale, is easy to maintain, and separates responsibilities clearly, enabling multiple engineers to work on different layers seamlessly. ES Modules (ESM) with `async/await` are used for modern Javascript standards and cleaner asynchronous code.
+* **`express`**: Minimalist web framework.
+* **`mongoose`**: MongoDB object modeling and schema validation.
+* **`mongoose-paginate-v2`**: Provides robust pagination capabilities for large datasets natively.
+* **`jsonwebtoken` & `bcryptjs`**: Secure authentication, password hashing, and token generation.
+* **`dotenv`, `cors`, `helmet`, `express-rate-limit`, `morgan`**: Security, environment config, and request logging.
 
-## Key Packages & Why They Are Used
+## 🚀 Setup Instructions
 
-*   **`express`**: Fast, minimalist web framework for building the API routing layer.
-*   **`mongoose`**: Elegant MongoDB object modeling providing a straight-forward, schema-based solution to model application data.
-*   **`dotenv`**: Loads environment variables from a `.env` file into `process.env`, keeping sensitive credentials out of the codebase.
-*   **`cors`**: Middleware to enable Cross-Origin Resource Sharing, allowing our frontend to communicate with the backend.
-*   **`morgan`**: HTTP request logger middleware used in development to see incoming requests and debug issues.
-*   **`helmet`**: Helps secure Express apps by setting various HTTP headers to mitigate common web vulnerabilities.
-*   **`bcryptjs`**: Library to hash passwords securely before saving them to the database.
-*   **`jsonwebtoken`**: Used for creating JSON Web Tokens (JWT) for authentication and authorization.
-*   **`express-rate-limit`**: Basic rate-limiting middleware to prevent brute-force and DDoS attacks.
-*   **`cookie-parser`**: Parse Cookie header and populate `req.cookies`, vital for secure authentication flows.
-*   **`nodemon` (devDependency)**: Utility that automatically restarts the node application when file changes in the directory are detected, drastically improving developer experience.
+1. **Environment Setup**:
+   * Ensure Node.js (v18+) and MongoDB are installed.
+   * Verify the `.env` file exists in the `backend` directory.
+   * Update `MONGODB_URI` with your connection string.
 
-## Setup Instructions
+2. **Installation**:
+   ```bash
+   npm install
+   ```
 
-1.  **Environment Setup**:
-    *   Ensure you have Node.js (v18+) and MongoDB installed.
-    *   Duplicate the `.env.example` file (if provided) to `.env` or just use the generated `.env` file.
-    *   Update `MONGODB_URI` with your local or cloud MongoDB connection string.
+3. **Database Seeding (Crucial Step)**:
+   This project includes a powerful seeder script to populate the database from the provided JSON dataset.
+   Run the following command to clean the database and insert the normalized data:
+   ```bash
+   npm run seed
+   # Or directly: node src/database/seeder.js
+   ```
 
-2.  **Installation**:
-    From this `backend` directory, run:
-    ```bash
-    npm install
-    ```
+4. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
 
-3.  **Run Development Server**:
-    Start the server with auto-restart enabled:
-    ```bash
-    npm run dev
-    ```
+## 📡 API Endpoints Overview
 
-## NPM Scripts
+All APIs return a standardized JSON format:
+```json
+{
+  "success": true,
+  "message": "Descriptive message here",
+  "data": { ... }
+}
+```
 
-*   `npm start`: Runs the server in production mode using Node directly (`node server.js`).
-*   `npm run dev`: Runs the server in development mode using Nodemon, watching for file changes (`nodemon server.js`).
+### Core Routes
+* `GET /health` - System health check
+* `GET /version` - API version info
 
-## Recommended Development Workflow
+### Authentication (`/auth`)
+* `POST /auth/register` - Register a new user/admin
+* `POST /auth/login` - Login and get JWT cookies
+* `GET /auth/me` - Get current logged-in user (Protected)
+* `POST /auth/logout` - Logout (Protected)
 
-1.  **Define Model**: Start by creating the Mongoose schema and model in `src/models`.
-2.  **Create Service**: Write business logic in `src/services` for creating, reading, updating, or deleting the data.
-3.  **Write Controller**: Create a handler in `src/controllers` using `asyncHandler`. Call the relevant service and format the response using `ApiResponse`.
-4.  **Set up Routes**: Add the endpoint to `src/routes` and link it to the controller.
-5.  **Apply Middleware**: Attach validators or auth middleware to the route as needed.
+### Bookings (`/bookings`)
+* `GET /bookings` - Get all bookings with dynamic filtering
+* `GET /bookings/stats` - Get aggregation stats (Admin only)
+* `GET /bookings/:id` - Get booking by ID
+* `POST /bookings` - Create new booking (Protected)
+* `PUT /bookings/:id` - Update booking (Protected)
+* `DELETE /bookings/:id` - Soft delete booking (Admin only)
 
-## Health Check
-To ensure the backend is running properly, the API includes a health check route:
-*   `GET /api/v1/health`
+### Other Entities (Full CRUD)
+* `/customers`
+* `/drivers`
+* `/vehicles`
+* `/locations`
+* `/payments`
+
+## 🔍 Advanced Querying & Filtering
+
+Our APIs support powerful dynamic querying right from the URL, powered by `queryBuilder.js`:
+
+* **Pagination & Sorting**: `GET /bookings?page=2&limit=50&sort=-fare`
+* **Regex Search**: `GET /bookings?keyword=Indira`
+* **Exact Matching**: `GET /bookings?status=Success&vehicle=Bike`
+* **Range Filtering**: `GET /bookings?minFare=500&maxFare=1500&minRating=4`

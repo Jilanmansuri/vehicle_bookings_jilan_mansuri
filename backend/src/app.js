@@ -44,6 +44,7 @@ app.use(cookieParser());
 
 // API Routes
 app.use('/api/v1', indexRouter);
+app.use('/', indexRouter);
 
 // Handle 404
 app.use(notFoundHandler);
