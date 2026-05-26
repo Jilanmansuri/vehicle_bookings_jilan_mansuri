@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "seed": "node src/database/seeder.js"
   },
   "keywords": [
     "vehicle",
@@ -23,10 +24,13 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.3.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.2",
-    "morgan": "^1.10.0"
+    "mongoose-paginate-v2": "^1.9.4",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
