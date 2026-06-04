@@ -14,6 +14,17 @@ const customerSchema = new Schema(
       trim: true,
       default: 'Unknown Customer',
     },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: null,
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: null,
+    },
     averageRating: {
       type: Number,
       default: 0,
