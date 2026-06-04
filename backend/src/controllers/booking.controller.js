@@ -15,6 +15,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import mongoose from 'mongoose';
+import { logActivity } from '../services/activity.service.js';
 
 export const getBookings = asyncHandler(async (req, res) => {
   const result = await getBookingsService(req.query);
@@ -47,6 +48,16 @@ export const getBookingById = asyncHandler(async (req, res) => {
 export const createBooking = asyncHandler(async (req, res) => {
   const booking = await createBookingService(req.body);
 
+  if (req.user) {
+    await logActivity({
+      userId: req.user._id,
+      action: 'Create',
+      entity: 'Booking',
+      details: `Created new booking with ID ${booking.bookingId || booking._id}`,
+      ipAddress: req.ip,
+    });
+  }
+
   return res
     .status(201)
     .json(new ApiResponse(201, booking, 'Booking created successfully'));
@@ -55,6 +66,16 @@ export const createBooking = asyncHandler(async (req, res) => {
 export const updateBooking = asyncHandler(async (req, res) => {
   const booking = await updateBookingService(req.params.id, req.body);
 
+  if (req.user) {
+    await logActivity({
+      userId: req.user._id,
+      action: 'Update',
+      entity: 'Booking',
+      details: `Updated booking ${req.params.id}`,
+      ipAddress: req.ip,
+    });
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, booking, 'Booking updated successfully'));
@@ -62,6 +83,16 @@ export const updateBooking = asyncHandler(async (req, res) => {
 
 export const deleteBooking = asyncHandler(async (req, res) => {
   await deleteBookingService(req.params.id);
+
+  if (req.user) {
+    await logActivity({
+      userId: req.user._id,
+      action: 'Delete',
+      entity: 'Booking',
+      details: `Soft deleted booking ${req.params.id}`,
+      ipAddress: req.ip,
+    });
+  }
 
   return res
     .status(200)
