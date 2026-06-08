@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   getMe,
+  refreshAccessToken
 } from '../controllers/auth.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
@@ -18,5 +19,6 @@ router.post('/login', authLimiter, loginValidationRules(), validate, loginUser);
 // Secured routes
 router.post('/logout', verifyJWT, logoutUser);
 router.get('/me', verifyJWT, getMe);
+router.post('/refresh-token', refreshAccessToken);
 
 export default router;

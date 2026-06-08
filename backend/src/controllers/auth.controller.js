@@ -2,6 +2,8 @@ import { User } from '../models/user.model.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { logActivity } from '../services/activity.service.js';
+import jwt from 'jsonwebtoken';
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -9,8 +11,9 @@ const generateAccessAndRefreshTokens = async (userId) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
     
-    // In a real production app, we would save the refreshToken to the DB as well,
-    // but for this checklist, generating and sending is sufficient.
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+
     return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, "Something went wrong while generating refresh and access tokens");
@@ -63,12 +66,27 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
   
   if (!isPasswordValid) {
+    await logActivity({
+      userId: user._id,
+      action: 'Failed_Login',
+      entity: 'System',
+      details: 'Invalid password attempt',
+      ipAddress: req.ip,
+    });
     throw new ApiError(401, "Invalid user credentials");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
   const loggedInUser = await User.findById(user._id).select("-password");
+
+  await logActivity({
+    userId: user._id,
+    action: 'Login',
+    entity: 'System',
+    details: 'User logged in successfully',
+    ipAddress: req.ip,
+  });
 
   const options = {
     httpOnly: true,
@@ -94,6 +112,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV === 'production',
   };
 
+  if (req.user) {
+    await logActivity({
+      userId: req.user._id,
+      action: 'Logout',
+      entity: 'System',
+      details: 'User logged out',
+      ipAddress: req.ip,
+    });
+  }
+
   return res
     .status(200)
     .clearCookie("accessToken", options)
@@ -113,4 +141,47 @@ const getMe = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "User fetched successfully"));
 });
 
-export { registerUser, loginUser, logoutUser, getMe };
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  try {
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    
+    const user = await User.findById(decodedToken?._id);
+
+    if (!user) {
+      throw new ApiError(401, "Invalid refresh token");
+    }
+
+    if (incomingRefreshToken !== user?.refreshToken) {
+      throw new ApiError(401, "Refresh token is expired or used");
+    }
+
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    };
+
+    const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", newRefreshToken, options)
+      .json(
+        new ApiResponse(
+          200, 
+          { accessToken, refreshToken: newRefreshToken }, 
+          "Access token refreshed"
+        )
+      );
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Invalid refresh token");
+  }
+});
+
+export { registerUser, loginUser, logoutUser, getMe, refreshAccessToken };

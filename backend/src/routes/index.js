@@ -13,6 +13,7 @@ import searchRouter from './search.routes.js';
 import statsRouter from './stats.routes.js';
 import jwtRouter from './jwt.routes.js';
 import swaggerRouter from './swagger.routes.js';
+import activityRouter from './activity.routes.js';
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use('/search', searchRouter);
 router.use('/stats', statsRouter);
 router.use('/jwt', jwtRouter);
 router.use('/swagger', swaggerRouter);
+router.use('/activity', activityRouter);
 
 export default router;
