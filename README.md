@@ -15,6 +15,14 @@ NexRide is a comprehensive, scalable, and highly secure vehicle booking manageme
 
 ---
 
+### 🔗 Live Links & Assets
+- **Frontend (Live Demo):** [https://vehicle-bookings-jilan-mansuri.vercel.app/](https://vehicle-bookings-jilan-mansuri.vercel.app/)
+- **Backend (API Base URL):** [https://vehicle-bookings-jilan-mansuri.onrender.com](https://vehicle-bookings-jilan-mansuri.onrender.com)
+- **API Documentation (Postman):** [View Documentation](https://documenter.getpostman.com/view/50840642/2sBXwntXuq)
+- **Dataset (JSON):** [Download via Google Drive](https://drive.google.com/file/d/1EfmhfrPLldqL5c3ZKMWq9A3M4E18Mpmm/view?usp=sharing)
+
+---
+
 ## ✨ Features
 
 ### For Passengers (Riders)

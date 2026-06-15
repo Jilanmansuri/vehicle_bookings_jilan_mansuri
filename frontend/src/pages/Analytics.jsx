@@ -1,4 +1,4 @@
-import { Paper, Typography, Grid, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Chip } from '@mui/material';
+import { Paper, Typography, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Avatar, Chip } from '@mui/material';
 import { 
   People as PeopleIcon, 
   DirectionsCar as CarIcon, 
@@ -77,13 +77,13 @@ const Analytics = () => {
     return (
       <div className="space-y-6">
         <Typography variant="h4"><Skeleton width="30%" /></Typography>
-        <Grid container spacing={4}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
           {[...Array(4)].map((_, i) => (
-            <Grid item xs={12} sm={6} lg={3} key={i}>
+            <div key={i}>
               <Skeleton variant="rectangular" height={160} className="rounded-[20px]" />
-            </Grid>
+            </div>
           ))}
-        </Grid>
+        </div>
       </div>
     );
   }
@@ -125,8 +125,8 @@ const Analytics = () => {
       </div>
 
       {/* Top Stat Cards Grid */}
-      <Grid container spacing={4}>
-        <Grid item xs={12} sm={6} lg={3}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div>
           <StatCard 
             title="Total Revenue (This Month)" 
             value={formatCurrency(thisMonthRev)} 
@@ -135,8 +135,8 @@ const Analytics = () => {
             trend={revTrend}
             delay={0.1}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        </div>
+        <div>
           <StatCard 
             title="Bookings (This Month)" 
             value={thisMonthBook.toLocaleString()} 
@@ -145,8 +145,8 @@ const Analytics = () => {
             trend={bookTrend}
             delay={0.2}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        </div>
+        <div>
           <StatCard 
             title="Total Active Users" 
             value={counts.users.toLocaleString()} 
@@ -155,8 +155,8 @@ const Analytics = () => {
             trend={12.5} // Simulated
             delay={0.3}
           />
-        </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        </div>
+        <div>
           <StatCard 
             title="Total Vehicles" 
             value={counts.vehicles.toLocaleString()} 
@@ -164,12 +164,12 @@ const Analytics = () => {
             color="bg-violet-500/10 dark:bg-violet-500/20"
             delay={0.4}
           />
-        </Grid>
-      </Grid>
+        </div>
+      </div>
 
-      <Grid container spacing={4}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
         {/* Main Area Chart */}
-        <Grid item xs={12} lg={8}>
+        <div className="lg:col-span-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
             <Paper className="p-6 md:p-8 shadow-xl dark:shadow-none dark:bg-[#1e293b] border border-gray-100 dark:border-white/5 rounded-[24px] h-[400px]">
               <div className="flex justify-between items-center mb-6">
@@ -207,10 +207,10 @@ const Analytics = () => {
               </ResponsiveContainer>
             </Paper>
           </motion.div>
-        </Grid>
+        </div>
 
         {/* Status Donut Chart */}
-        <Grid item xs={12} lg={4}>
+        <div className="lg:col-span-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6 }}>
             <Paper className="p-6 md:p-8 shadow-xl dark:shadow-none dark:bg-[#1e293b] border border-gray-100 dark:border-white/5 rounded-[24px] h-[400px] flex flex-col relative">
               <Typography variant="h6" className="font-bold text-gray-800 dark:text-white mb-2">
@@ -257,13 +257,13 @@ const Analytics = () => {
               </div>
             </Paper>
           </motion.div>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
 
       {/* Bottom Section: Top Drivers Table & Top Vehicles Bar */}
-      <Grid container spacing={4}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
         {/* Top Drivers Table */}
-        <Grid item xs={12} lg={7}>
+        <div className="lg:col-span-7">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}>
             <Paper className="shadow-xl dark:shadow-none dark:bg-[#1e293b] border border-gray-100 dark:border-white/5 rounded-[24px] overflow-hidden">
               <div className="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
@@ -315,10 +315,10 @@ const Analytics = () => {
               </TableContainer>
             </Paper>
           </motion.div>
-        </Grid>
+        </div>
 
         {/* Top Vehicles Bar Chart */}
-        <Grid item xs={12} lg={5}>
+        <div className="lg:col-span-5">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.8 }}>
             <Paper className="p-6 md:p-8 shadow-xl dark:shadow-none dark:bg-[#1e293b] border border-gray-100 dark:border-white/5 rounded-[24px] h-full min-h-[350px]">
               <Typography variant="h6" className="font-bold mb-6 text-gray-800 dark:text-white">
@@ -343,8 +343,8 @@ const Analytics = () => {
               </ResponsiveContainer>
             </Paper>
           </motion.div>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </motion.div>
   );
 };
