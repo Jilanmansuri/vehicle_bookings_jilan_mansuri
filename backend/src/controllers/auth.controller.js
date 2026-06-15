@@ -4,6 +4,10 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { logActivity } from '../services/activity.service.js';
 import jwt from 'jsonwebtoken';
+import { OAuth2Client } from 'google-auth-library';
+import crypto from 'crypto';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -184,4 +188,76 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, logoutUser, getMe, refreshAccessToken };
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+
+  if (!credential) {
+    throw new ApiError(400, "Google token is required");
+  }
+
+  try {
+    // Verify Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email, name } = payload;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Register user automatically using a strong random password
+      const randomPassword = crypto.randomBytes(16).toString('hex') + 'Aa1@';
+      user = await User.create({
+        name,
+        email,
+        password: randomPassword,
+        role: 'user', // Default role
+      });
+      
+      await logActivity({
+        userId: user._id,
+        action: 'Create',
+        entity: 'System',
+        details: 'User registered via Google Sign-In',
+        ipAddress: req.ip,
+      });
+    }
+
+    // Generate JWT tokens
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
+    const loggedInUser = await User.findById(user._id).select("-password");
+
+    await logActivity({
+      userId: user._id,
+      action: 'Login',
+      entity: 'System',
+      details: 'User logged in via Google Sign-In',
+      ipAddress: req.ip,
+    });
+
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          { user: loggedInUser, accessToken, refreshToken },
+          "Google Login successful"
+        )
+      );
+  } catch (error) {
+    console.error("Google verify error:", error);
+    throw new ApiError(401, "Invalid Google token");
+  }
+});
+
+export { registerUser, loginUser, logoutUser, getMe, refreshAccessToken, googleLogin };

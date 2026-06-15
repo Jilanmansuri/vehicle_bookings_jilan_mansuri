@@ -4,6 +4,9 @@ import { buildQueryFilters, buildPaginateOptions } from '../utils/queryBuilder.j
 import mongoose from 'mongoose';
 import { Vehicle } from '../models/vehicle.model.js';
 import { Payment } from '../models/payment.model.js';
+import { User } from '../models/user.model.js';
+import { Driver } from '../models/driver.model.js';
+import { Location } from '../models/location.model.js';
 
 /**
  * Get all bookings with dynamic filters, sorting, and pagination
@@ -70,7 +73,19 @@ export const getBookingByIdService = async (id) => {
  * Create new booking
  */
 export const createBookingService = async (data) => {
-  // Add validation logic or specific transformations if needed
+  // Auto-generate required fields if they are missing
+  if (!data.bookingId) {
+    data.bookingId = `BKG${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  }
+  
+  const now = new Date();
+  if (!data.date) {
+    data.date = now;
+  }
+  if (!data.time) {
+    data.time = now.toTimeString().split(' ')[0]; // "HH:MM:SS"
+  }
+
   const booking = await Booking.create(data);
   return booking;
 };
@@ -112,6 +127,11 @@ export const deleteBookingService = async (id) => {
  * Get Aggregated Booking Statistics
  */
 export const getBookingStatsService = async () => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const startOfThisMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const startOfLastMonth = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1);
+
   const stats = await Booking.aggregate([
     {
       $facet: {
@@ -135,12 +155,58 @@ export const getBookingStatsService = async () => {
           },
           { $unwind: "$vehicleInfo" },
           { $project: { type: "$vehicleInfo.type", count: 1 } }
+        ],
+        revenueOverTime: [
+          { $match: { date: { $gte: thirtyDaysAgo } } },
+          { $group: { _id: { $dateToString: { format: "%m-%d", date: "$date" } }, revenue: { $sum: "$fare" }, bookings: { $sum: 1 } } },
+          { $sort: { _id: 1 } }
+        ],
+        thisMonth: [
+          { $match: { date: { $gte: startOfThisMonth } } },
+          { $group: { _id: null, revenue: { $sum: "$fare" }, bookings: { $sum: 1 } } }
+        ],
+        lastMonth: [
+          { $match: { date: { $gte: startOfLastMonth, $lt: startOfThisMonth } } },
+          { $group: { _id: null, revenue: { $sum: "$fare" }, bookings: { $sum: 1 } } }
+        ],
+        topDriversList: [
+          { $match: { driver: { $ne: null } } },
+          { $group: { _id: "$driver", count: { $sum: 1 }, revenue: { $sum: "$fare" } } },
+          { $sort: { revenue: -1 } },
+          { $limit: 5 },
+          {
+            $lookup: {
+              from: 'drivers',
+              localField: '_id',
+              foreignField: '_id',
+              as: 'driverInfo'
+            }
+          },
+          { $unwind: "$driverInfo" },
+          { $project: { name: "$driverInfo.name", averageRating: "$driverInfo.averageRating", count: 1, revenue: 1 } }
         ]
       }
     }
   ]);
 
-  return stats[0];
+  const statsObj = stats[0];
+
+  // Fetch counts from other collections
+  const [totalUsers, totalVehicles, totalDrivers, totalLocations] = await Promise.all([
+    User.countDocuments(),
+    Vehicle.countDocuments(),
+    Driver.countDocuments(),
+    Location.countDocuments()
+  ]);
+
+  statsObj.entityCounts = {
+    users: totalUsers,
+    vehicles: totalVehicles,
+    drivers: totalDrivers,
+    locations: totalLocations
+  };
+
+  return statsObj;
 };
 
 /**
