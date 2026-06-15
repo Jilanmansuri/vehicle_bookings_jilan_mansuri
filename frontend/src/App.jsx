@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -23,6 +23,7 @@ const LocationsList = lazy(() => import('./pages/LocationsList'));
 const PaymentsList = lazy(() => import('./pages/PaymentsList'));
 const Settings = lazy(() => import('./pages/Settings'));
 const ActivityLogsList = lazy(() => import('./pages/ActivityLogsList'));
+const Analytics = lazy(() => import('./pages/Analytics'));
 
 const FallbackLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-[#0f172a]">
@@ -43,7 +44,33 @@ function App() {
     typography: {
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     },
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none',
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: mode === 'dark' ? 'rgba(31, 41, 55, 0.5)' : 'rgba(255, 255, 255, 0.8)',
+            }
+          }
+        }
+      }
+    }
   });
+
+  useEffect(() => {
+    if (mode === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [mode]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -76,6 +103,7 @@ function App() {
                 <Route path="settings" element={<Settings />} />
 
                 {/* Admin Only Routes */}
+                <Route path="analytics" element={<ProtectedRoute requireAdmin><Analytics /></ProtectedRoute>} />
                 <Route path="users" element={<ProtectedRoute requireAdmin><UsersList /></ProtectedRoute>} />
                 <Route path="drivers" element={<ProtectedRoute requireAdmin><DriversList /></ProtectedRoute>} />
                 <Route path="locations" element={<ProtectedRoute requireAdmin><LocationsList /></ProtectedRoute>} />
