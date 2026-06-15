@@ -13,6 +13,12 @@
 
 NexRide is a comprehensive, scalable, and highly secure vehicle booking management system designed to emulate the core functionalities of industry-leading ride-hailing applications like Uber and Ola. The platform seamlessly bridges the gap between passengers seeking reliable transportation and drivers offering their services. It features role-based access control, real-time fare estimation, geo-spatial driver tracking, and an extensive admin dashboard for fleet management and analytics. Built using the robust MERN stack, the application ensures high performance, maintainability, and scalability to handle thousands of concurrent ride requests.
 
+### 🔗 Live Links & Assets
+- **Frontend (Live Demo):** [https://vehicle-bookings-jilan-mansuri.vercel.app/](https://vehicle-bookings-jilan-mansuri.vercel.app/)
+- **Backend (API Base URL):** [https://vehicle-bookings-jilan-mansuri.onrender.com](https://vehicle-bookings-jilan-mansuri.onrender.com)
+- **API Documentation (Postman):** [View Documentation](https://documenter.getpostman.com/view/50840642/2sBXwntXuq)
+- **Dataset (JSON):** [Download via Google Drive](https://drive.google.com/file/d/1EfmhfrPLldqL5c3ZKMWq9A3M4E18Mpmm/view?usp=sharing)
+
 ---
 
 ## ✨ Features
