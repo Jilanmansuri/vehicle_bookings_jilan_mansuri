@@ -4,7 +4,8 @@ import {
   loginUser,
   logoutUser,
   getMe,
-  refreshAccessToken
+  refreshAccessToken,
+  googleLogin
 } from '../controllers/auth.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
@@ -15,6 +16,7 @@ const router = Router();
 
 router.post('/register', authLimiter, registerValidationRules(), validate, registerUser);
 router.post('/login', authLimiter, loginValidationRules(), validate, loginUser);
+router.post('/google', authLimiter, googleLogin);
 
 // Secured routes
 router.post('/logout', verifyJWT, logoutUser);
