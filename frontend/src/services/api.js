@@ -36,6 +36,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Ignore canceled requests (e.g. from React Query unmounting)
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
     if (error.response) {
