@@ -23,6 +23,8 @@ const BookRideModal = ({ open, onClose, onSuccess }) => {
   }, [open]);
 
   const fetchDropdownData = async () => {
+    const extractDocs = (res) => Array.isArray(res.data.data) ? res.data.data : (res.data.data?.docs || []);
+
     try {
       const [custRes, vehRes, locRes, payRes] = await Promise.all([
         api.get('/customers?limit=50'),
@@ -31,10 +33,10 @@ const BookRideModal = ({ open, onClose, onSuccess }) => {
         api.get('/payments?limit=20')
       ]);
       setData({
-        customers: custRes.data.data.docs || [],
-        vehicles: vehRes.data.data.docs || [],
-        locations: locRes.data.data.docs || [],
-        payments: payRes.data.data.docs || []
+        customers: extractDocs(custRes),
+        vehicles: extractDocs(vehRes),
+        locations: extractDocs(locRes),
+        payments: extractDocs(payRes)
       });
     } catch (error) {
       console.error("Failed to load options", error);
@@ -69,11 +71,11 @@ const BookRideModal = ({ open, onClose, onSuccess }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle className="dark:bg-gray-800 dark:text-white font-bold border-b dark:border-gray-700">
+      <DialogTitle className="dark:bg-slate-900 dark:text-white font-bold border-b dark:border-slate-800/50">
         Book a New Ride
       </DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent className="dark:bg-gray-800 space-y-4 pt-4">
+        <DialogContent className="dark:bg-slate-900 flex flex-col gap-5 pt-6 pb-4">
           <TextField select fullWidth label="Customer" name="customer" value={formData.customer} onChange={handleChange} required>
             {data.customers.map(c => <MenuItem key={c._id} value={c._id}>{c.name || c.customerId}</MenuItem>)}
           </TextField>
@@ -90,7 +92,7 @@ const BookRideModal = ({ open, onClose, onSuccess }) => {
             {data.locations.map(l => <MenuItem key={l._id} value={l._id}>{l.name}</MenuItem>)}
           </TextField>
 
-          <div className="flex gap-4">
+          <div className="flex gap-5">
             <TextField fullWidth type="number" label="Distance (km)" name="distance" value={formData.distance} onChange={handleChange} required />
             <TextField fullWidth type="number" label="Estimated Fare (₹)" name="fare" value={formData.fare} onChange={handleChange} required />
           </div>
@@ -99,10 +101,10 @@ const BookRideModal = ({ open, onClose, onSuccess }) => {
             {data.payments.map(p => <MenuItem key={p._id} value={p._id}>{p.method}</MenuItem>)}
           </TextField>
         </DialogContent>
-        <DialogActions className="dark:bg-gray-800 border-t dark:border-gray-700 p-4">
-          <Button onClick={onClose} color="inherit" className="dark:text-gray-300">Cancel</Button>
-          <Button type="submit" variant="contained" color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Book Ride'}
+        <DialogActions className="dark:bg-slate-900 border-t dark:border-slate-800/50 p-4">
+          <Button onClick={onClose} color="inherit" className="dark:text-gray-300 font-semibold mr-2">Cancel</Button>
+          <Button type="submit" variant="contained" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md font-bold px-6 py-2" disabled={loading}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Book Ride'}
           </Button>
         </DialogActions>
       </form>
