@@ -15,8 +15,11 @@ const ActivityLogsList = () => {
     setLoading(true);
     try {
       const response = await api.get(`/activity?page=${page + 1}&limit=${pageSize}`);
-      setRows(response.data.data.docs || []);
-      setTotalRows(response.data.data.totalDocs || 0);
+      const data = response.data.data;
+      const docs = Array.isArray(data) ? data : (data?.docs || []);
+      const total = Array.isArray(data) ? data.length : (data?.totalDocs || 0);
+      setRows(docs);
+      setTotalRows(total);
     } catch (error) {
       toast.error('Failed to fetch activity logs');
     } finally {
