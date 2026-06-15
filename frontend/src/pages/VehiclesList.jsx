@@ -1,38 +1,73 @@
-import { useState, useEffect } from 'react';
-import { Typography, Button, Chip, IconButton } from '@mui/material';
+import { useState } from 'react';
+import { Typography, Button, Chip, IconButton, Box } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 import DataTable from '../components/DataTable';
 import api from '../services/api';
 import { createVehicle, updateVehicle, deleteVehicle } from '../services/vehicle.service';
 import VehicleFormModal from '../components/VehicleFormModal';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
-import { toast } from 'react-toastify';
+
+const fetchVehicles = async ({ queryKey }) => {
+  const [_key, { page, pageSize }] = queryKey;
+  const response = await api.get(`/vehicles?page=${page + 1}&limit=${pageSize}`);
+  return response.data.data;
+};
 
 const VehiclesList = () => {
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+  
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [totalRows, setTotalRows] = useState(0);
-
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false);
 
-  const fetchVehicles = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/vehicles?page=${page + 1}&limit=${pageSize}`);
-      setRows(response.data.data.docs || []);
-      setTotalRows(response.data.data.totalDocs || 0);
-    } catch (error) {
-      console.error('Failed to fetch vehicles:', error);
-      toast.error('Failed to load vehicles');
-    } finally {
-      setLoading(false);
+  const { data, isLoading } = useQuery({
+    queryKey: ['vehicles', { page, pageSize }],
+    queryFn: fetchVehicles,
+    keepPreviousData: true,
+  });
+
+  const mutationOptions = {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      setIsFormOpen(false);
+      setIsDeleteOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Action failed');
     }
   };
+
+  const createMutation = useMutation({
+    mutationFn: createVehicle,
+    ...mutationOptions,
+    onSuccess: () => {
+      toast.success('Vehicle added successfully');
+      mutationOptions.onSuccess();
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, values }) => updateVehicle(id, values),
+    ...mutationOptions,
+    onSuccess: () => {
+      toast.success('Vehicle updated successfully');
+      mutationOptions.onSuccess();
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteVehicle,
+    ...mutationOptions,
+    onSuccess: () => {
+      toast.success('Vehicle deleted successfully');
+      mutationOptions.onSuccess();
+    }
+  });
 
   const handleAddClick = () => {
     setSelectedVehicle(null);
@@ -49,42 +84,17 @@ const VehiclesList = () => {
     setIsDeleteOpen(true);
   };
 
-  const handleFormSubmit = async (values) => {
-    setActionLoading(true);
-    try {
-      if (selectedVehicle) {
-        await updateVehicle(selectedVehicle._id, values);
-        toast.success('Vehicle updated successfully');
-      } else {
-        await createVehicle(values);
-        toast.success('Vehicle added successfully');
-      }
-      setIsFormOpen(false);
-      fetchVehicles(); // Refresh list
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Action failed');
-    } finally {
-      setActionLoading(false);
+  const handleFormSubmit = (values) => {
+    if (selectedVehicle) {
+      updateMutation.mutate({ id: selectedVehicle._id, values });
+    } else {
+      createMutation.mutate(values);
     }
   };
 
-  const handleConfirmDelete = async () => {
-    setActionLoading(true);
-    try {
-      await deleteVehicle(selectedVehicle._id);
-      toast.success('Vehicle deleted successfully');
-      setIsDeleteOpen(false);
-      fetchVehicles(); // Refresh list
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Delete failed');
-    } finally {
-      setActionLoading(false);
-    }
+  const handleConfirmDelete = () => {
+    deleteMutation.mutate(selectedVehicle._id);
   };
-
-  useEffect(() => {
-    fetchVehicles();
-  }, [page, pageSize]);
 
   const columns = [
     { field: 'type', headerName: 'Vehicle Type', width: 200 },
@@ -97,6 +107,7 @@ const VehiclesList = () => {
           label={params.value ? 'Available' : 'Unavailable'} 
           color={params.value ? 'success' : 'error'} 
           size="small" 
+          className="font-semibold"
         />
       )
     },
@@ -114,7 +125,7 @@ const VehiclesList = () => {
             size="small" 
             color="primary" 
             onClick={() => handleEditClick(params.row)}
-            className="hover:bg-blue-50 dark:hover:bg-gray-800"
+            className="hover:bg-blue-50 dark:hover:bg-gray-800 transition-colors"
           >
             <EditIcon fontSize="small" />
           </IconButton>
@@ -122,7 +133,7 @@ const VehiclesList = () => {
             size="small" 
             color="error" 
             onClick={() => handleDeleteClick(params.row)}
-            className="hover:bg-red-50 dark:hover:bg-gray-800"
+            className="hover:bg-red-50 dark:hover:bg-gray-800 transition-colors"
           >
             <DeleteIcon fontSize="small" />
           </IconButton>
@@ -131,9 +142,16 @@ const VehiclesList = () => {
     }
   ];
 
+  const actionLoading = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-6"
+    >
+      <Box className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <Typography variant="h4" className="font-bold text-gray-800 dark:text-white">
             Vehicles Directory
@@ -146,23 +164,30 @@ const VehiclesList = () => {
           variant="contained" 
           color="primary" 
           startIcon={<AddIcon />}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-blue-600 hover:bg-blue-700 shadow-md lift-on-hover px-6 py-2 rounded-xl font-bold"
           onClick={handleAddClick}
         >
           Add Vehicle
         </Button>
-      </div>
+      </Box>
 
-      <DataTable 
-        columns={columns}
-        rows={rows}
-        loading={loading}
-        page={page}
-        pageSize={pageSize}
-        totalRows={totalRows}
-        onPageChange={setPage}
-        onPageSizeChange={setPageSize}
-      />
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="glass rounded-xl overflow-hidden"
+      >
+        <DataTable 
+          columns={columns}
+          rows={data?.docs || []}
+          loading={isLoading}
+          page={page}
+          pageSize={pageSize}
+          totalRows={data?.totalDocs || 0}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      </motion.div>
 
       <VehicleFormModal 
         open={isFormOpen}
@@ -180,7 +205,7 @@ const VehiclesList = () => {
         title="Delete Vehicle"
         message={`Are you sure you want to delete the vehicle "${selectedVehicle?.type}"?`}
       />
-    </div>
+    </motion.div>
   );
 };
 
