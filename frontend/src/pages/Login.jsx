@@ -15,6 +15,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('');
 
   const formik = useFormik({
     initialValues: {
@@ -111,6 +112,48 @@ const Login = () => {
           
           <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>
             <div className="space-y-5">
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Login As</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedRole('user');
+                      formik.setFieldValue('email', 'user@example.com');
+                      formik.setFieldValue('password', 'password123');
+                    }}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl border font-semibold text-sm transition-all duration-300 cursor-pointer ${
+                      selectedRole === 'user'
+                        ? 'bg-blue-600/10 border-blue-500 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400 bg-white/40 dark:bg-gray-800/40'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedRole('admin');
+                      formik.setFieldValue('email', 'admin@example.com');
+                      formik.setFieldValue('password', 'password123');
+                    }}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl border font-semibold text-sm transition-all duration-300 cursor-pointer ${
+                      selectedRole === 'admin'
+                        ? 'bg-indigo-600/10 border-indigo-500 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-500/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400 bg-white/40 dark:bg-gray-800/40'
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Admin
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
                 <input
