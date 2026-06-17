@@ -20,7 +20,7 @@ import { bookingCreateLimiter } from '../middlewares/rateLimiter.middleware.js';
 const router = Router();
 
 // Specialized read routes (Must be above /:id)
-router.get('/stats', verifyJWT, isAdmin, getBookingStats);
+router.get('/stats', verifyJWT, getBookingStats);
 router.get('/recent', getRecentBookings);
 router.get('/top', getTopBookings); // Will handle /top without params
 router.get('/top/:category', getTopBookings); // Handle /top/lowest-fare

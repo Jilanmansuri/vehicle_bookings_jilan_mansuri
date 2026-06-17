@@ -24,3 +24,4 @@ router.get('/me', verifyJWT, getMe);
 router.post('/refresh-token', refreshAccessToken);
 
 export default router;
+
