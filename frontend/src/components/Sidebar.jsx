@@ -34,6 +34,7 @@ const Sidebar = ({ open }) => {
 
   const userMenuItems = [
     { title: 'Dashboard', path: '/dashboard', icon: <DashboardIcon /> },
+    { title: 'Analytics', path: '/dashboard/analytics', icon: <AnalyticsIcon /> },
     { title: 'My Bookings', path: '/dashboard/bookings', icon: <BookingIcon /> },
     { title: 'Available Vehicles', path: '/dashboard/vehicles', icon: <CarIcon /> },
     { title: 'Booking History', path: '/dashboard/history', icon: <HistoryIcon /> },

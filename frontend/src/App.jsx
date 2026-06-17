@@ -12,6 +12,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy loaded pages
+const Landing = lazy(() => import('./pages/Landing'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -24,6 +25,7 @@ const PaymentsList = lazy(() => import('./pages/PaymentsList'));
 const Settings = lazy(() => import('./pages/Settings'));
 const ActivityLogsList = lazy(() => import('./pages/ActivityLogsList'));
 const Analytics = lazy(() => import('./pages/Analytics'));
+
 
 const FallbackLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-[#0f172a]">
@@ -79,7 +81,7 @@ function App() {
         <BrowserRouter>
           <Suspense fallback={<FallbackLoader />}>
             <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<Landing />} />
               
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
@@ -96,6 +98,7 @@ function App() {
               >
                 {/* Available for both Admin and User */}
                 <Route index element={<Dashboard />} />
+                <Route path="analytics" element={<Analytics />} />
                 <Route path="bookings" element={<BookingsList />} />
                 <Route path="vehicles" element={<VehiclesList />} />
                 <Route path="payments" element={<PaymentsList />} />
@@ -103,7 +106,6 @@ function App() {
                 <Route path="settings" element={<Settings />} />
 
                 {/* Admin Only Routes */}
-                <Route path="analytics" element={<ProtectedRoute requireAdmin><Analytics /></ProtectedRoute>} />
                 <Route path="users" element={<ProtectedRoute requireAdmin><UsersList /></ProtectedRoute>} />
                 <Route path="drivers" element={<ProtectedRoute requireAdmin><DriversList /></ProtectedRoute>} />
                 <Route path="locations" element={<ProtectedRoute requireAdmin><LocationsList /></ProtectedRoute>} />
