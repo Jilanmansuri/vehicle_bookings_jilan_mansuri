@@ -1,4 +1,4 @@
-# 🚖 NexRide - Full Stack Vehicle Booking Management System
+# 🚖 Ridemetrics - Full Stack Vehicle Booking Management System
 
 <div align="center">
   <h3>An Enterprise-Grade, Uber/Ola-style Vehicle Booking and Fleet Management Platform</h3>
@@ -11,7 +11,7 @@
 
 ## 📝 Project Description
 
-NexRide is a comprehensive, scalable, and highly secure vehicle booking management system designed to emulate the core functionalities of industry-leading ride-hailing applications like Uber and Ola. The platform seamlessly bridges the gap between passengers seeking reliable transportation and drivers offering their services. It features role-based access control, real-time fare estimation, geo-spatial driver tracking, and an extensive admin dashboard for fleet management and analytics. Built using the robust MERN stack, the application ensures high performance, maintainability, and scalability to handle thousands of concurrent ride requests.
+Ridemetrics is a comprehensive, scalable, and highly secure vehicle booking management system designed to emulate the core functionalities of industry-leading ride-hailing applications like Uber and Ola. The platform seamlessly bridges the gap between passengers seeking reliable transportation and drivers offering their services. It features role-based access control, real-time fare estimation, geo-spatial driver tracking, and an extensive admin dashboard for fleet management and analytics. Built using the robust MERN stack, the application ensures high performance, maintainability, and scalability to handle thousands of concurrent ride requests.
 
 ---
 
